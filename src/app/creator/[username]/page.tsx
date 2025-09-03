@@ -1,4 +1,8 @@
 import Image from "next/image";
+import { getInfoUser } from "./_data-access/get-info-user";
+import { notFound } from "next/navigation";
+import { use } from "react";
+import { FormDonate } from "./_components/form";
 
 export default async function Apoia({
   params,
@@ -7,14 +11,17 @@ export default async function Apoia({
 }) {
   const { username } = await params;
 
+  const user = await getInfoUser({ username })
 
-  console.log(username);
+  if (!user) {
+    notFound()
+  }
 
   return (
     <div className=" min-h-[calc(100vh-64px)]">
       <div className="w-full h-64 relative bg-black">
         <Image
-          src={"https://github.com/devfraga.png"}
+          src={user.image ?? "https://github.com/devfraga.png"}
           alt="Banner"
           fill
           className="object-cover opacity-50"
@@ -42,10 +49,10 @@ export default async function Apoia({
       <div className="grid grid-cols-1 md:grid-cols-2 w-full mx-auto gap-4 max-w-5xl">
         <section className="hidden md:flex flex-col bg-gray-50 p-5 rounded-md h-fit mx-2">
           <p className="font-semibold text-lg">
-            Sobre Fulano Dev
+            Sobre {user.name ?? "Sem nome"}
           </p>
           <p className="text-gray-500 mt-2">
-            Descrição generica sobre o fulano dev
+            {user.bio ?? "Sem descrição"}
           </p>
         </section>
 
@@ -53,9 +60,10 @@ export default async function Apoia({
           className="bg-gray-50 rounded-md p-5 h-fit mx-2"
         >
           <h3 className="font-semibold text-lg">
-            Apoie o Matheus Fraga:
+            {user.name ? `Doar para ${user.name}` : "Doar para Fulano Dev"}
           </h3>
 
+          <FormDonate />
 
         </section>
       </div>
